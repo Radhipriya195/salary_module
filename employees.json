@@ -1,0 +1,34 @@
+[
+    {
+        "name": "Radhi",
+        "empid": "CBT-001",
+        "role": "Junior developer",
+        "salary": 28000
+    },
+    {
+    
+        "name": "Sowmi",
+        "empid": "CBT-002",
+        "role": "Intern",
+        "salary": 15000
+        
+    },
+    {
+        "name": "Anu",
+        "empid": "CBT-003",
+        "role": "Developer",
+        "salary": 40000
+    },
+    {
+        "name": "Sri", 
+        "empid": "CBT-004",
+        "role": "Quality Analyst",
+        "salary": 25000
+    },
+    {
+        "name": "Didi",
+        "empid": "CBT-005",
+        "role": "Intern",
+        "salary": 15000
+    }
+]

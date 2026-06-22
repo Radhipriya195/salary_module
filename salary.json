@@ -8,5 +8,35 @@
         "Days_you_worked": 24,
         "Per_day_salary": 500,
         "Final_salary": 12000
+    },
+    {
+        "Name": "Sowmi",
+        "Emp_id": "CBT-002",
+        "Role": "Intern",
+        "Month": "June",
+        "Total_days_this_month": "30",
+        "Days_you_worked": 30,
+        "Per_day_salary": 500,
+        "Final_salary": 16000
+    },
+    {
+        "Name": "Radhi",
+        "Emp_id": "CBT-001",
+        "Role": "Junior developer",
+        "Month": "June",
+        "Total_days_this_month": "30",
+        "Days_you_worked": 30,
+        "Per_day_salary": 933,
+        "Final_salary": 29000
+    },
+    {
+        "Name": "Sowmi",
+        "Emp_id": "CBT-002",
+        "Role": "Intern",
+        "Month": "June",
+        "Total_days_this_month": "30",
+        "Days_you_worked": 30,
+        "Per_day_salary": 500,
+        "Final_salary": 16000
     }
 ]

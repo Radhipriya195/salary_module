@@ -37,12 +37,23 @@ class SalaryManager
      */
     public function calculateSalary(Employeedetails $_employee, int $_daysWorked, int $_totalDays)
     {
+        $message = "";
 
         $perDay = $_employee->getSalary() / $_totalDays;
-        $final = $perDay * $_daysWorked;
+        if ($_daysWorked === $_totalDays) {
+            $final = ($perDay * $_daysWorked) + 1000;
+            $message = "Bonus Added 1000rs";
+        } else if ($_daysWorked < $_totalDays / 2) {
+            $final = ($perDay * $_daysWorked) - 1000;
+            $message = "Deduction charged 1000rs";
+        } else {
+            $final = ($perDay * $_daysWorked);
+            $message = "No bonus or Deduction charged";
+        }
 
         echo "\n-------CALCULATED SALARY-------\n";
         echo "Per Day Salary: ₹" . round($perDay) . "\n";
+        echo "Bonus or Deduction : " . $message . "\n";
         echo "Final Salary: ₹" . round($final) . "\n";
 
         $record = [
@@ -98,7 +109,7 @@ class SalaryManager
         echo "\nName: " . $employee->getName() . "\n";
         echo "Salary: ₹" . $employee->getSalary() . "\n";
         echo "Role: " . $employee->getRole() . "\n \n";
- 
+
         $totalDays = date("t");
         echo "-------MONTH INFO------\n";
         echo "Current month is: " . date("F") . "(" . $totalDays . " Days) \n";

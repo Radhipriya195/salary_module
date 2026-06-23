@@ -47,14 +47,4 @@ class EmployeeDetails
 	{
 		$this->LPA = $LPA;
 	}
-
-	/* Convert back to JSON format 
-	public function toArray()
-	{
-		return [
-			"name" => $this->name,
-			"role" => $this->role,
-			"LPA" => $this->LPA
-		];
-	}*/
 }

@@ -17,8 +17,8 @@ class SalaryManager
 
 	/**
 	 * Finds an employee by their ID
-	 * @param $_emp_id
-	 * return 
+	 * @param $_emp_id - Employee id
+	 * @return EmployeeDetails|null
 	 */
 	public function findEmployee(string $_emp_id)
 	{
@@ -27,6 +27,10 @@ class SalaryManager
 
 	/** 
 	 * Calculates monthly salary
+	 * @param $_employee   Employee details
+	 * @param $_days_worked  Days worked by the employee
+	 * @param $_total_days  Total days in the month
+	 * @return void
 	 */
 	public function calculateSalary(EmployeeDetails $_employee, int $_days_worked, int $_total_days)
 	{
@@ -34,7 +38,7 @@ class SalaryManager
 		$per_day_salary = $monthly_salary / $_total_days;
 		$earned_salary = $per_day_salary * $_days_worked;
 
-		$pf = $earned_salary * 0.12;
+		$pf = $monthly_salary * 0.12;
 		$lpa = $_employee->getLPA();
 
 		if ($lpa <= 300000) {
@@ -54,7 +58,7 @@ class SalaryManager
 		echo "Tax Deduction: ₹" . round($monthly_tax) . "\n";
 		echo "Final In-hand: ₹" . round($in_hand_salary) . "\n";
 
-		$record = [
+		$monthly_payslip = [
 			"Name" => $_employee->getName(),
 			"Emp_id" => $_employee->getEmpId(),
 			"Role" => $_employee->getRole(),
@@ -68,13 +72,14 @@ class SalaryManager
 
 		];
 
-		$this->saveToJson($record);
+		$this->saveToJson($monthly_payslip);
 	}
-
 	/**
 	 * Saves data to json
+	 * @param $_record provides monthly salary details
+	 * @return void
 	 */
-	public function saveToJson(array $_record)
+	public function saveToJson(array $_monthly_payslip)
 	{
 		$data = [];
 
@@ -82,13 +87,14 @@ class SalaryManager
 			$data = json_decode(file_get_contents("salary.json"), true);
 		}
 
-		$data[] = $_record;
+		$data[] = $_monthly_payslip;
 
 		file_put_contents("salary.json", json_encode($data, JSON_PRETTY_PRINT));
 	}
 
 	/**
 	 * Executes employee salary flow
+	 * @return void
 	 */
 	public function run()
 	{

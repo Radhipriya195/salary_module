@@ -3,30 +3,30 @@
         "name": "Radhi",
         "empId": "CBT-001",
         "role": "Software Engineer - Grade 1",
-        "LPA": 400000
+        "lakhsperannum": 400000
     },
      {
         "name": "Sowmi",
         "empId": "CBT-002",
         "role": "Software Engineer - Grade 2",
-        "LPA": 800000
+        "lakhsperannum": 800000
     },
     {
         "name": "Anu",
         "empId": "CBT-003",
         "role": "Software Engineer - Grade 3",
-        "LPA": 1500000
+        "lakhsperannum": 1500000
     },
     {
         "name": "Sri",
         "empId": "CBT-004",
         "role": "Software Engineer - Grade 2",
-        "LPA": 700000
+        "lakhsperannum": 700000
     },
     {
         "name": "Didi",
         "empId":  "CBT-005",
         "role": "Software Engineer - Grade 1",
-        "LPA": 350000
+        "lakhsperannum": 350000
     }
 ] 

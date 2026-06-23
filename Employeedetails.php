@@ -5,15 +5,15 @@ class EmployeeDetails
 	private string $empid;
 	private string $name;
 	private string $role;
-	private int $LPA;
+	private int $lakhs_per_annum;
 
 	// Constructor
-	public function __construct(string $_name, string $_empid, string $_role, int $_LPA)
+	public function __construct(string $_name, string $_empid, string $_role, int $_lakhs_per_annum)
 	{
 		$this->name = $_name;
 		$this->empid = $_empid;
 		$this->role = $_role;
-		$this->LPA = $_LPA;
+		$this->lakhs_per_annum = $_lakhs_per_annum;
 	}
 
 	// Getters
@@ -29,9 +29,9 @@ class EmployeeDetails
 	{
 		return $this->role;
 	}
-	public function getLPA()
+	public function getLakhsPerAnnum()
 	{
-		return $this->LPA;
+		return $this->lakhs_per_annum;
 	}
 
 	// Setters
@@ -43,8 +43,8 @@ class EmployeeDetails
 	{
 		$this->role = $role;
 	}
-	public function setSalary(int $LPA)
+	public function setSalary(int $lakhs_per_annum)
 	{
-		$this->LPA = $LPA;
+		$this->lakhs_per_annum = $lakhs_per_annum;
 	}
 }

@@ -11,7 +11,7 @@ class SalaryManager
 		$data = json_decode(file_get_contents($this->file), True);
 
 		foreach ($data as $emp) {
-			$this->employees[$emp["empId"]] = new EmployeeDetails($emp["name"], $emp["empId"], $emp["role"], $emp["LPA"]);
+			$this->employees[$emp["empId"]] = new EmployeeDetails($emp["name"], $emp["empId"], $emp["role"], $emp["lakhsperannum"]);
 		}
 	}
 
@@ -34,19 +34,19 @@ class SalaryManager
 	 */
 	public function calculateSalary(EmployeeDetails $_employee, int $_days_worked, int $_total_days)
 	{
-		$monthly_salary = $_employee->getLPA() / 12;
+		$monthly_salary = $_employee->getLakhsPerAnnum() / 12;
 		$per_day_salary = $monthly_salary / $_total_days;
 		$earned_salary = $per_day_salary * $_days_worked;
 
 		$pf = $monthly_salary * 0.12;
-		$lpa = $_employee->getLPA();
+		$lakhs_per_annum = $_employee->getLakhsPerAnnum();
 
-		if ($lpa <= 300000) {
+		if ($lakhs_per_annum <= 300000) {
 			$yearly_tax = 0;
-		} elseif ($lpa <= 600000) {
-			$yearly_tax = (int)$lpa * 0.05;
+		} elseif ($lakhs_per_annum <= 600000) {
+			$yearly_tax = (int)$lakhs_per_annum * 0.05;
 		} else {
-			$yearly_tax = (int) $lpa * 0.08;
+			$yearly_tax = (int) $lakhs_per_annum * 0.08;
 		}
 
 		$monthly_tax = $yearly_tax / 12;
@@ -76,7 +76,7 @@ class SalaryManager
 	}
 	/**
 	 * Saves data to json
-	 * @param $_record provides monthly salary details
+	 * @param $_monthly_payslip provides monthly salary details
 	 * @return void
 	 */
 	public function saveToJson(array $_monthly_payslip)
@@ -111,7 +111,7 @@ class SalaryManager
 		}
 
 		echo "\nName: " . $employee->getName() . "\n";
-		echo "LPA: ₹" . $employee->getLPA() . "\n";
+		echo "LPA: ₹" . $employee->getLakhsPerAnnum() . "\n";
 		echo "Role: " . $employee->getRole() . "\n \n";
 
 		$total_days = date("t");

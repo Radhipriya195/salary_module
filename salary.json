@@ -82,5 +82,17 @@
         "PF": 8000,
         "Tax": 5333,
         "Final_salary": 48889
+    },
+    {
+        "Name": "Radhi",
+        "Emp_id": "CBT-001",
+        "Role": "Software Engineer - Grade 1",
+        "Month": "June",
+        "Total_days_this_month": "30",
+        "Days_you_worked": 28,
+        "Monthly_salary": 33333,
+        "PF": 4000,
+        "Tax": 1667,
+        "Final_salary": 25444
     }
 ]

@@ -48,7 +48,7 @@ class EmployeeDetails
 		$this->LPA = $LPA;
 	}
 
-	// Convert back to JSON format 
+	/* Convert back to JSON format 
 	public function toArray()
 	{
 		return [
@@ -56,5 +56,5 @@ class EmployeeDetails
 			"role" => $this->role,
 			"LPA" => $this->LPA
 		];
-	}
+	}*/
 }

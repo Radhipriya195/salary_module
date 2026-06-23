@@ -1,5 +1,5 @@
 <?php
-require_once 'Employeedetails.php';
+require_once 'EmployeeDetails.php';
 
 class SalaryManager
 {
@@ -8,53 +8,51 @@ class SalaryManager
 
 	public function __construct()
 	{
-		$data = json_decode(file_get_contents($this->file));
+		$data = json_decode(file_get_contents($this->file), True);
 
 		foreach ($data as $emp) {
-			$this->employees[] = new Employeedetails($emp->name, $emp->empid, $emp->role, $emp->salary);
+			$this->employees[$emp["empId"]] = new EmployeeDetails($emp["name"], $emp["empId"], $emp["role"], $emp["LPA"]);
 		}
 	}
+
 	/**
 	 * Finds an employee by their ID
-	 *
-	 * @param int $_id
+	 * @param $_emp_id
+	 * return 
 	 */
-	public function findEmployee($_id)
+	public function findEmployee(string $_emp_id)
 	{
-		foreach ($this->employees as $emp) {
-			if ($emp->getEmpId() == $_id) {
-				return $emp;
-			}
-		}
-		return null;
+		return $this->employees[$_emp_id] ?? null;
 	}
-	/**
-	 * Calculates montly salary
-	 *
-	 * @param Employeedetails $_employee Employee Object,
-	 * @param int $_daysWorked No of days worked
-	 * @return void
-	 */
-	public function calculateSalary(Employeedetails $_employee, int $_daysWorked, int $_totalDays)
-	{
-		$message = "";
 
-		$perDay = $_employee->getSalary() / $_totalDays;
-		if ($_daysWorked === $_totalDays) {
-			$final = ($perDay * $_daysWorked) + 1000;
-			$message = "Bonus Added 1000rs";
-		} else if ($_daysWorked < $_totalDays / 2) {
-			$final = ($perDay * $_daysWorked) - 1000;
-			$message = "Deduction charged 1000rs";
+	/** 
+	 * Calculates monthly salary
+	 */
+	public function calculateSalary(EmployeeDetails $_employee, int $_days_worked, int $_total_days)
+	{
+		$monthly_salary = $_employee->getLPA() / 12;
+		$per_day_salary = $monthly_salary / $_total_days;
+		$earned_salary = $per_day_salary * $_days_worked;
+
+		$pf = $earned_salary * 0.12;
+		$lpa = $_employee->getLPA();
+
+		if ($lpa <= 300000) {
+			$yearly_tax = 0;
+		} elseif ($lpa <= 600000) {
+			$yearly_tax = (int)$lpa * 0.05;
 		} else {
-			$final = ($perDay * $_daysWorked);
-			$message = "No bonus or Deduction charged";
+			$yearly_tax = (int) $lpa * 0.08;
 		}
 
-		echo "\n-------CALCULATED SALARY-------\n";
-		echo "Per Day Salary: ₹" . round($perDay) . "\n";
-		echo "Bonus or Deduction : " . $message . "\n";
-		echo "Final Salary: ₹" . round($final) . "\n";
+		$monthly_tax = $yearly_tax / 12;
+		$in_hand_salary = $earned_salary - $pf - $monthly_tax;
+
+		echo "\n-------SALARY CALCULATION-------\n";
+		echo "Monthly Salary: ₹" . round($monthly_salary) . "\n";
+		echo "PF Deduction (12%): ₹" . round($pf) . "\n";
+		echo "Tax Deduction: ₹" . round($monthly_tax) . "\n";
+		echo "Final In-hand: ₹" . round($in_hand_salary) . "\n";
 
 		$record = [
 			"Name" => $_employee->getName(),
@@ -62,9 +60,12 @@ class SalaryManager
 			"Role" => $_employee->getRole(),
 			"Month" => date("F"),
 			"Total_days_this_month" => date("t"),
-			"Days_you_worked" => $_daysWorked,
-			"Per_day_salary" => round($perDay),
-			"Final_salary" => round($final)
+			"Days_you_worked" => $_days_worked,
+			"Monthly_salary" => round($monthly_salary),
+			"PF" => round($pf),
+			"Tax" => round($monthly_tax),
+			"Final_salary" => round($in_hand_salary)
+
 		];
 
 		$this->saveToJson($record);
@@ -72,11 +73,8 @@ class SalaryManager
 
 	/**
 	 * Saves data to json
-	 * @param array $record updated details of the employee
-	 * @return void
 	 */
-
-	public function saveToJson(array $record)
+	public function saveToJson(array $_record)
 	{
 		$data = [];
 
@@ -84,43 +82,44 @@ class SalaryManager
 			$data = json_decode(file_get_contents("salary.json"), true);
 		}
 
-		$data[] = $record;
+		$data[] = $_record;
 
 		file_put_contents("salary.json", json_encode($data, JSON_PRETTY_PRINT));
 	}
 
 	/**
-	 * Executes employees final salary
-	 * return void
+	 * Executes employee salary flow
 	 */
 	public function run()
 	{
 		echo "-------EMPLOYEE DETAILS-------\n";
 
 		while (true) {
-			$id = readline("Enter Employee ID: ");
-			$employee = $this->findEmployee($id);
+			$employee_id = readline("Enter Employee ID: ");
+			$employee = $this->findEmployee($employee_id);
 
 			if ($employee !== null) {
 				break;
 			}
 			echo "Employee not found, Enter a valid ID.\n\n";
 		}
+
 		echo "\nName: " . $employee->getName() . "\n";
-		echo "Salary: ₹" . $employee->getSalary() . "\n";
+		echo "LPA: ₹" . $employee->getLPA() . "\n";
 		echo "Role: " . $employee->getRole() . "\n \n";
 
-		$totalDays = date("t");
+		$total_days = date("t");
+
 		echo "-------MONTH INFO------\n";
-		echo "Current month is: " . date("F") . "(" . $totalDays . " Days) \n";
+		echo "Current month is: " . date("F") . " (" . $total_days . " Days)\n";
 
-		$_daysWorked = readline("Enter days you worked: ");
+		$days_worked = readline("Enter days you worked: ");
 
-		if (!is_numeric($_daysWorked) || $_daysWorked <= 0 || $_daysWorked > $totalDays) {
-			echo "Invalid days entered : Days worked cannot exceed total days. \n \n";
+		if (!is_numeric($days_worked) || $days_worked <= 0 || $days_worked > $total_days) {
+			echo "Invalid days entered : Days worked cannot exceed total days.\n\n";
 			return;
 		}
 
-		$this->calculateSalary($employee, $_daysWorked, $totalDays);
+		$this->calculateSalary($employee, $days_worked, $total_days);
 	}
 }

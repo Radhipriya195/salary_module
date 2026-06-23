@@ -2,7 +2,7 @@
 
 require_once 'SalaryManager.php';
 
-class mainfile
+class MainFile
 {
 	public function startFunction()
 	{
@@ -11,5 +11,5 @@ class mainfile
 	}
 }
 
-$start = new mainfile();
+$start = new MainFile();
 $start->startFunction();

@@ -2,30 +2,35 @@
     {
         "name": "Radhi",
         "empId": "CBT-001",
+        "grade": 1,
         "role": "Software Engineer - Grade 1",
         "lakhsperannum": 400000
     },
      {
         "name": "Sowmi",
         "empId": "CBT-002",
+        "grade": 2,
         "role": "Software Engineer - Grade 2",
         "lakhsperannum": 800000
     },
     {
         "name": "Anu",
         "empId": "CBT-003",
+        "grade": 3,
         "role": "Software Engineer - Grade 3",
         "lakhsperannum": 1500000
     },
     {
         "name": "Sri",
         "empId": "CBT-004",
+        "grade":2,
         "role": "Software Engineer - Grade 2",
         "lakhsperannum": 700000
     },
     {
         "name": "Didi",
         "empId":  "CBT-005",
+        "grade":1,
         "role": "Software Engineer - Grade 1",
         "lakhsperannum": 350000
     }

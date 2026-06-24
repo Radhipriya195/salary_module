@@ -1,5 +1,8 @@
 <?php
 require_once 'EmployeeDetails.php';
+require_once 'Grade1Employee.php';
+require_once 'Grade2Employee.php';
+require_once 'Grade3Employee.php';
 
 class SalaryManager
 {
@@ -11,21 +14,35 @@ class SalaryManager
 		$data = json_decode(file_get_contents($this->file), True);
 
 		foreach ($data as $emp) {
-			$this->employees[$emp["empId"]] = new EmployeeDetails($emp["name"], $emp["empId"], $emp["role"], $emp["lakhsperannum"]);
+			$this->employees[$emp["empId"]] = $this->createEmployee($emp);
+		}
+	}
+	private function createEmployee($emp)
+	{
+		$grade = $emp["grade"];
+
+		if ($grade == 1) {
+			return new Grade1Employee($emp["name"], $emp["empId"], $emp["role"], $emp["lakhsperannum"]);
+		} elseif ($grade == 2) {
+			return new Grade2Employee($emp["name"], $emp["empId"], $emp["role"], $emp["lakhsperannum"]);
+		} elseif ($grade == 3) {
+			return new Grade3Employee($emp["name"], $emp["empId"], $emp["role"], $emp["lakhsperannum"]);
+		} else {
+			return new EmployeeDetails($emp["name"], $emp["empId"], $emp["role"], $emp["lakhsperannum"]);
 		}
 	}
 
 	/**
 	 * Finds an employee by their ID
-	 * @param $_emp_id - Employee id
+	 * @param $_emp_id  Employee id
 	 * @return EmployeeDetails|null
 	 */
-	public function findEmployee(string $_emp_id)
+	public function findEmployee(string $_employee_id)
 	{
-		return $this->employees[$_emp_id] ?? null;
+		return $this->employees[$_employee_id] ?? null;
 	}
 
-	/** 
+	/**
 	 * Calculates monthly salary
 	 * @param $_employee   Employee details
 	 * @param $_days_worked  Days worked by the employee
@@ -50,12 +67,14 @@ class SalaryManager
 		}
 
 		$monthly_tax = $yearly_tax / 12;
-		$in_hand_salary = $earned_salary - $pf - $monthly_tax;
+		$bonus = $earned_salary * $_employee->getBonusPercentage();
+		$in_hand_salary = $earned_salary + $bonus - $pf - $monthly_tax;
 
 		echo "\n-------SALARY CALCULATION-------\n";
 		echo "Monthly Salary: ₹" . round($monthly_salary) . "\n";
 		echo "PF Deduction (12%): ₹" . round($pf) . "\n";
 		echo "Tax Deduction: ₹" . round($monthly_tax) . "\n";
+		echo "bonus:" .round($bonus) . "\n";
 		echo "Final In-hand: ₹" . round($in_hand_salary) . "\n";
 
 		$monthly_payslip = [

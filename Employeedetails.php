@@ -47,4 +47,8 @@ class EmployeeDetails
 	{
 		$this->lakhs_per_annum = $lakhs_per_annum;
 	}
+	public function getBonusPercentage(): float
+	{
+		return 0.0;
+	}
 }

@@ -10,7 +10,7 @@ class SalaryManager
 	private $employees = [];
 
 	public function __construct()
-	{
+	{ 
 		$data = json_decode(file_get_contents($this->file), True);
 
 		foreach ($data as $emp) {

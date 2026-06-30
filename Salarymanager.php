@@ -3,21 +3,23 @@ require_once 'EmployeeDetails.php';
 require_once 'Grade1Employee.php';
 require_once 'Grade2Employee.php';
 require_once 'Grade3Employee.php';
+require_once 'Database.php';
 
 class SalaryManager
 {
-	private $file = "employees.json";
 	private $employees = [];
+	private mysqli $connection;
 
 	public function __construct()
-	{ 
-		$data = json_decode(file_get_contents($this->file), True);
-
-		foreach ($data as $emp) {
+	{
+		$database = new Database();
+		$this->connection = $database->connect();
+		$result = $this->connection->query("SELECT * FROM employees");
+		while ($emp = $result->fetch_assoc()) {
 			$this->employees[$emp["empId"]] = $this->createEmployee($emp);
 		}
 	}
-	private function createEmployee($emp)
+	private function createEmployee(Array $emp)
 	{
 		$grade = $emp["grade"];
 
@@ -27,14 +29,12 @@ class SalaryManager
 			return new Grade2Employee($emp["name"], $emp["empId"], $emp["role"], $emp["lakhsperannum"]);
 		} elseif ($grade == 3) {
 			return new Grade3Employee($emp["name"], $emp["empId"], $emp["role"], $emp["lakhsperannum"]);
-		} else {
-			return new EmployeeDetails($emp["name"], $emp["empId"], $emp["role"], $emp["lakhsperannum"]);
 		}
 	}
 
 	/**
 	 * Finds an employee by their ID
-	 * @param $_emp_id  Employee id
+	 * @param $_employee_id  Employee id
 	 * @return EmployeeDetails|null
 	 */
 	public function findEmployee(string $_employee_id)
@@ -74,41 +74,67 @@ class SalaryManager
 		echo "Monthly Salary: ₹" . round($monthly_salary) . "\n";
 		echo "PF Deduction (12%): ₹" . round($pf) . "\n";
 		echo "Tax Deduction: ₹" . round($monthly_tax) . "\n";
-		echo "bonus:" .round($bonus) . "\n";
+		echo "bonus:" . round($bonus) . "\n";
 		echo "Final In-hand: ₹" . round($in_hand_salary) . "\n";
 
 		$monthly_payslip = [
-			"Name" => $_employee->getName(),
-			"Emp_id" => $_employee->getEmpId(),
-			"Role" => $_employee->getRole(),
-			"Month" => date("F"),
-			"Total_days_this_month" => date("t"),
-			"Days_you_worked" => $_days_worked,
-			"Monthly_salary" => round($monthly_salary),
-			"PF" => round($pf),
-			"Tax" => round($monthly_tax),
-			"Final_salary" => round($in_hand_salary)
-
+			"emp_id" => $_employee->getEmpId(),
+			"name" => $_employee->getName(),
+			"role" => $_employee->getRole(),
+			"month" => date("F Y"),
+			"total_days" => date("t"),
+			"days_worked" => $_days_worked,
+			"monthly_salary" => round($monthly_salary),
+			"pf" => round($pf),
+			"tax" => round($monthly_tax),
+			"final_salary" => round($in_hand_salary)
 		];
-
-		$this->saveToJson($monthly_payslip);
+		$this->saveToDataBase($monthly_payslip);
 	}
 	/**
 	 * Saves data to json
 	 * @param $_monthly_payslip provides monthly salary details
 	 * @return void
 	 */
-	public function saveToJson(array $_monthly_payslip)
+	public function saveToDataBase(array $_monthly_payslip)
 	{
-		$data = [];
+		$statement = $this->connection->prepare(
+			"SELECT id FROM salary_transactions WHERE emp_id = ? AND month = ?"
+		);
+		$statement->bind_param("ss", $_monthly_payslip["emp_id"], $_monthly_payslip["month"]);
+		$statement->execute();
+		$result = $statement->get_result();
 
-		if (file_exists("salary.json")) {
-			$data = json_decode(file_get_contents("salary.json"), true);
+		if ($result->num_rows > 0) {
+			echo "\n Salary already generated for this month!\n";
+			return;
 		}
 
-		$data[] = $_monthly_payslip;
+		// Insert
+		$statement = $this->connection->prepare(
+			"INSERT INTO salary_transactions 
+            (emp_id, name, role, month, total_days, days_worked, monthly_salary, pf, tax, final_salary)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+		);
 
-		file_put_contents("salary.json", json_encode($data, JSON_PRETTY_PRINT));
+		$statement->bind_param(
+			"ssssiiiiii",
+			$_monthly_payslip["emp_id"],
+			$_monthly_payslip["name"],
+			$_monthly_payslip["role"],
+			$_monthly_payslip["month"],
+			$_monthly_payslip["total_days"],
+			$_monthly_payslip["days_worked"],
+			$_monthly_payslip["monthly_salary"],
+			$_monthly_payslip["pf"],
+			$_monthly_payslip["tax"],
+			$_monthly_payslip["final_salary"]
+		);
+		if ($statement->execute()) {
+			echo "\nSalary saved to database successfully!\n";
+		} else {
+			echo "\nError saving salary: " . $statement->error . "\n";
+		}
 	}
 
 	/**

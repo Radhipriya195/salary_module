@@ -1,17 +1,23 @@
 <?php
 
-class EmployeeDetails
+abstract class EmployeeDetails
 {
-	private string $empid;
+	private string $emp_id;
 	private string $name;
 	private string $role;
 	private int $lakhs_per_annum;
-
-	// Constructor
-	public function __construct(string $_name, string $_empid, string $_role, int $_lakhs_per_annum)
+	/**
+	 * saves employee details.
+	 * @param string $_name           Employee name
+	 * @param string $_emp_id         Employee id
+	 * @param string $_role           Employee role
+	 * @param int $_lakhs_per_annum   Employee's LPA 
+	 * @return void
+	 */
+	public function __construct(string $_name, string $_emp_id, string $_role, int $_lakhs_per_annum)
 	{
 		$this->name = $_name;
-		$this->empid = $_empid;
+		$this->emp_id = $_emp_id;
 		$this->role = $_role;
 		$this->lakhs_per_annum = $_lakhs_per_annum;
 	}
@@ -19,7 +25,7 @@ class EmployeeDetails
 	// Getters
 	public function getEmpId()
 	{
-		return $this->empid;
+		return $this->emp_id;
 	}
 	public function getName()
 	{
@@ -47,8 +53,5 @@ class EmployeeDetails
 	{
 		$this->lakhs_per_annum = $lakhs_per_annum;
 	}
-	public function getBonusPercentage(): float
-	{
-		return 0.0;
-	}
+	 abstract function getBonusPercentage();
 }

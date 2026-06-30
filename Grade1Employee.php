@@ -7,7 +7,7 @@ class Grade1Employee extends EmployeeDetails
         parent::__construct($_name, $_emp_Id, $_role, $_lakhs_per_annum);
     }
 
-    public function getBonusPercentage(): float
+    public function getBonusPercentage()
     {
         return 0.05;
     }

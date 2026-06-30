@@ -142,5 +142,17 @@
         "PF": 4000,
         "Tax": 1667,
         "Final_salary": 22333
+    },
+    {
+        "Name": "Sowmi",
+        "Emp_id": "CBT-002",
+        "Role": "Software Engineer - Grade 2",
+        "Month": "June",
+        "Total_days_this_month": "30",
+        "Days_you_worked": 28,
+        "Monthly_salary": 66667,
+        "PF": 8000,
+        "Tax": 5333,
+        "Final_salary": 53867
     }
 ]

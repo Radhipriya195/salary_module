@@ -1,5 +1,4 @@
 <?php
-public $mysqli connection;
 class Database {
     private $host = "localhost";
     private $user = "root";

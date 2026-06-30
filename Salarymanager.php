@@ -15,21 +15,26 @@ class SalaryManager
 		$database = new Database();
 		$this->connection = $database->connect();
 		$result = $this->connection->query("SELECT * FROM employees");
+
+		if (!$result) {
+			die("Query failed: " . $this->connection->error);
+		}
 		while ($emp = $result->fetch_assoc()) {
-			$this->employees[$emp["empId"]] = $this->createEmployee($emp);
+			$this->employees[$emp["employee_id"]] = $this->createEmployee($emp);
 		}
 	}
-	private function createEmployee(Array $emp)
+	private function createEmployee(array $emp)
 	{
 		$grade = $emp["grade"];
 
 		if ($grade == 1) {
-			return new Grade1Employee($emp["name"], $emp["empId"], $emp["role"], $emp["lakhsperannum"]);
+			return new Grade1Employee($emp["name"], $emp["employee_id"], $emp["role"], $emp["lakhsperannum"]);
 		} elseif ($grade == 2) {
-			return new Grade2Employee($emp["name"], $emp["empId"], $emp["role"], $emp["lakhsperannum"]);
+			return new Grade2Employee($emp["name"], $emp["employee_id"], $emp["role"], $emp["lakhsperannum"]);
 		} elseif ($grade == 3) {
-			return new Grade3Employee($emp["name"], $emp["empId"], $emp["role"], $emp["lakhsperannum"]);
+			return new Grade3Employee($emp["name"], $emp["employee_id"], $emp["role"], $emp["lakhsperannum"]);
 		}
+		throw new Exception("Invalid grade: " . $grade);
 	}
 
 	/**
@@ -61,9 +66,9 @@ class SalaryManager
 		if ($lakhs_per_annum <= 300000) {
 			$yearly_tax = 0;
 		} elseif ($lakhs_per_annum <= 600000) {
-			$yearly_tax = (int)$lakhs_per_annum * 0.05;
+			$yearly_tax = $lakhs_per_annum * 0.05;
 		} else {
-			$yearly_tax = (int) $lakhs_per_annum * 0.08;
+			$yearly_tax = $lakhs_per_annum * 0.08;
 		}
 
 		$monthly_tax = $yearly_tax / 12;

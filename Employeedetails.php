@@ -5,21 +5,22 @@ abstract class EmployeeDetails
 	private string $emp_id;
 	private string $name;
 	private string $role;
-	private int $lakhs_per_annum;
+	private int $annual_salary;
 	/**
 	 * saves employee details.
 	 * @param string $_name           Employee name
 	 * @param string $_emp_id         Employee id
 	 * @param string $_role           Employee role
-	 * @param int $_lakhs_per_annum   Employee's LPA 
+	 * @param int $_annual_salary     Employee's annual salary
 	 * @return void
 	 */
-	public function __construct(string $_name, string $_emp_id, string $_role, int $_lakhs_per_annum)
+	public function __construct(string $_name, string $_emp_id, string $_role, int $_annual_salary)
+
 	{
 		$this->name = $_name;
 		$this->emp_id = $_emp_id;
 		$this->role = $_role;
-		$this->lakhs_per_annum = $_lakhs_per_annum;
+		$this->annual_salary= $_annual_salary;
 	}
 
 	// Getters
@@ -35,9 +36,9 @@ abstract class EmployeeDetails
 	{
 		return $this->role;
 	}
-	public function getLakhsPerAnnum()
+	public function getAnnualSalary()
 	{
-		return $this->lakhs_per_annum;
+		return $this->annual_salary;
 	}
 
 	// Setters
@@ -49,9 +50,9 @@ abstract class EmployeeDetails
 	{
 		$this->role = $role;
 	}
-	public function setSalary(int $lakhs_per_annum)
+	public function setSalary(int $annual_salary)
 	{
-		$this->lakhs_per_annum = $lakhs_per_annum;
+		$this->annual_salary = $annual_salary;
 	}
 	 abstract function getBonusPercentage();
 }

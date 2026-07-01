@@ -14,7 +14,7 @@ class SalaryManager
 	{
 		$database = new Database();
 		$this->connection = $database->connect();
-		$result = $this->connection->query("SELECT * FROM employees");
+		$result = $this->connection->query("SELECT * FROM employee_details");
 
 		if (!$result) {
 			die("Query failed: " . $this->connection->error);
@@ -28,13 +28,12 @@ class SalaryManager
 		$grade = $emp["grade"];
 
 		if ($grade == 1) {
-			return new Grade1Employee($emp["name"], $emp["employee_id"], $emp["role"], $emp["lakhsperannum"]);
+			return new Grade1Employee($emp["name"], $emp["employee_id"], $emp["role"], $emp["annual_salary"]);
 		} elseif ($grade == 2) {
-			return new Grade2Employee($emp["name"], $emp["employee_id"], $emp["role"], $emp["lakhsperannum"]);
+			return new Grade2Employee($emp["name"], $emp["employee_id"], $emp["role"], $emp["annual_salary"]);
 		} elseif ($grade == 3) {
-			return new Grade3Employee($emp["name"], $emp["employee_id"], $emp["role"], $emp["lakhsperannum"]);
+			return new Grade3Employee($emp["name"], $emp["employee_id"], $emp["role"], $emp["annual_salary"]);
 		}
-		throw new Exception("Invalid grade: " . $grade);
 	}
 
 	/**
@@ -56,19 +55,19 @@ class SalaryManager
 	 */
 	public function calculateSalary(EmployeeDetails $_employee, int $_days_worked, int $_total_days)
 	{
-		$monthly_salary = $_employee->getLakhsPerAnnum() / 12;
+		$monthly_salary = $_employee->getAnnualSalary() / 12;
 		$per_day_salary = $monthly_salary / $_total_days;
 		$earned_salary = $per_day_salary * $_days_worked;
 
 		$pf = $monthly_salary * 0.12;
-		$lakhs_per_annum = $_employee->getLakhsPerAnnum();
+		$annual_salary = $_employee->getAnnualSalary();
 
-		if ($lakhs_per_annum <= 300000) {
+		if ($annual_salary <= 300000) {
 			$yearly_tax = 0;
-		} elseif ($lakhs_per_annum <= 600000) {
-			$yearly_tax = $lakhs_per_annum * 0.05;
+		} elseif ($annual_salary <= 600000) {
+			$yearly_tax = $annual_salary * 0.05;
 		} else {
-			$yearly_tax = $lakhs_per_annum * 0.08;
+			$yearly_tax = $annual_salary * 0.08;
 		}
 
 		$monthly_tax = $yearly_tax / 12;
@@ -82,10 +81,20 @@ class SalaryManager
 		echo "bonus:" . round($bonus) . "\n";
 		echo "Final In-hand: ₹" . round($in_hand_salary) . "\n";
 
+		$statement = $this->connection->prepare("SELECT id FROM employee_details WHERE employee_id = ?");
+
+		$employee_id = $_employee->getEmpId();
+
+		$statement->bind_param("s", $employee_id);
+		$statement->execute();
+
+		$result = $statement->get_result();
+		$row = $result->fetch_assoc();
+
+		$dbEmployeeId = $row["id"];
+
 		$monthly_payslip = [
-			"emp_id" => $_employee->getEmpId(),
-			"name" => $_employee->getName(),
-			"role" => $_employee->getRole(),
+			"employee_id" => $dbEmployeeId,
 			"month" => date("F Y"),
 			"total_days" => date("t"),
 			"days_worked" => $_days_worked,
@@ -103,30 +112,34 @@ class SalaryManager
 	 */
 	public function saveToDataBase(array $_monthly_payslip)
 	{
+		
 		$statement = $this->connection->prepare(
-			"SELECT id FROM salary_transactions WHERE emp_id = ? AND month = ?"
+			"SELECT id FROM salary_transactions
+         WHERE employee_id = ? AND month = ?"
 		);
-		$statement->bind_param("ss", $_monthly_payslip["emp_id"], $_monthly_payslip["month"]);
+
+		$statement->bind_param(
+			"is",
+			$_monthly_payslip["employee_id"],
+			$_monthly_payslip["month"]
+		);
+
 		$statement->execute();
 		$result = $statement->get_result();
 
 		if ($result->num_rows > 0) {
-			echo "\n Salary already generated for this month!\n";
+			echo "\nSalary already generated for this month!\n";
 			return;
 		}
 
-		// Insert
-		$statement = $this->connection->prepare(
-			"INSERT INTO salary_transactions 
-            (emp_id, name, role, month, total_days, days_worked, monthly_salary, pf, tax, final_salary)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-		);
+		// Insert salary details
+		$statement = $this->connection->prepare("INSERT INTO salary_transactions
+        (employee_id, month, total_days, days_worked, monthly_salary, pf, tax, final_salary)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
 		$statement->bind_param(
-			"ssssiiiiii",
-			$_monthly_payslip["emp_id"],
-			$_monthly_payslip["name"],
-			$_monthly_payslip["role"],
+			"isiiiiii",
+			$_monthly_payslip["employee_id"],
 			$_monthly_payslip["month"],
 			$_monthly_payslip["total_days"],
 			$_monthly_payslip["days_worked"],
@@ -135,13 +148,13 @@ class SalaryManager
 			$_monthly_payslip["tax"],
 			$_monthly_payslip["final_salary"]
 		);
+
 		if ($statement->execute()) {
 			echo "\nSalary saved to database successfully!\n";
 		} else {
 			echo "\nError saving salary: " . $statement->error . "\n";
 		}
 	}
-
 	/**
 	 * Executes employee salary flow
 	 * @return void
@@ -161,7 +174,7 @@ class SalaryManager
 		}
 
 		echo "\nName: " . $employee->getName() . "\n";
-		echo "LPA: ₹" . $employee->getLakhsPerAnnum() . "\n";
+		echo "Annual Salary: ₹" . $employee->getAnnualSalary() . "\n";
 		echo "Role: " . $employee->getRole() . "\n \n";
 
 		$total_days = date("t");
